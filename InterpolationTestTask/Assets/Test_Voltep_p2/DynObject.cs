@@ -6,7 +6,7 @@ namespace VTest
 {
     public class DynObject : MonoBehaviour
     {
-        private Vector3 _position;
+        private Vector3 _newPosition;
         private Vector3 _oldPosition;
         private Vector3 _velocity;
         private float _time;
@@ -24,7 +24,10 @@ namespace VTest
       {
           GetData(data);
           CanMoveCheck();
-          SetOldPosition(data.position);
+          if (_canMove)
+          {
+              SetOldPosition(data.position);
+          }
       };
         }
 
@@ -45,25 +48,26 @@ namespace VTest
 
         private void Move()
         {
-            transform.position = Vector3.SmoothDamp(this.transform.position, _position, ref _velocity, _time);
+            transform.position = Vector3.SmoothDamp(this.transform.position, _newPosition, ref _velocity, _time);
         }
 
         private void Teleport()
         {
             _canMove = false;
             _teleport = false;
-            transform.position = _position;
+            SetOldPosition(this.transform.position);
+            this.transform.position = _newPosition;
         }
 
         private void SetStartSettings()
         {
-            _position = this.transform.position;
-            SetOldPosition(_position + Vector3.one);
+            _newPosition = this.transform.position;
+            SetOldPosition(_newPosition + Vector3.one);
         }
 
         private void GetData(ObjectSnapshotData data)
         {
-            _position = data.position;
+            _newPosition = data.position;
             _velocity = data.velocity;
             _time = data.time;
             _teleport = data.teleport;
@@ -71,7 +75,7 @@ namespace VTest
 
         private void CanMoveCheck()
         {
-            if (_position != _oldPosition)
+            if (_newPosition != _oldPosition)
             {
                 _canMove = true;
             }
